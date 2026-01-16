@@ -2,8 +2,10 @@
 export enum KeyCodes {
   UP = '\x1B[A',
   DOWN = '\x1B[B',
+  LEFT = '',
+  RIGHT = '',
   ENTER = '\r',
-  ESC = '\x1B', 
+  ESC = '\x1B',
   CTRL_C = '\u0003',
   SPACE = ' '
 }
@@ -17,7 +19,7 @@ const KEY_MAP: Record<string, KeyCodes> = {
   '\u0003': KeyCodes.CTRL_C
 };
 
-type InputEvent = {
+export type InputEvent = {
   command: KeyCodes;
   raw: Buffer;
 };
@@ -26,7 +28,7 @@ export class InputHandler {
   private listeners = new Set<(event: InputEvent) => void>();
   private isRunning = false;
 
-  private handleKeyPress = (buffer: Buffer) => {
+  private getCommandByKey = (buffer: Buffer) => {
     const key = buffer.toString();
     const command = KEY_MAP[key] ?? null;
 
@@ -52,14 +54,14 @@ export class InputHandler {
     }
 
     process.stdin.resume();
-    process.stdin.on('data', this.handleKeyPress);
+    process.stdin.on('data', this.getCommandByKey);
     this.isRunning = true;
   }
 
   stop() {
     if (!this.isRunning) return;
 
-    process.stdin.off('data', this.handleKeyPress);
+    process.stdin.off('data', this.getCommandByKey);
     process.stdin.pause();
 
     if (process.stdin.isTTY) {
@@ -81,7 +83,9 @@ export class InputHandler {
 export class Navigator {
   private index = 0;
 
-  constructor(private optionsLength: number) {}
+  constructor(private optionsLength: number) {
+    if (optionsLength < 1) return;
+  }
 
   moveUp() {
     this.index = (this.index - 1 + this.optionsLength) % this.optionsLength;
