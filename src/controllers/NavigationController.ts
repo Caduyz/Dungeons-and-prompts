@@ -54,27 +54,21 @@ start() {
     this.isRunning = false;
   }
 
-  // Método chamado toda vez que chega dado no stdin
   private handleData = (data: string) => {
     const buffer = Buffer.from(data, 'utf8');
 
-    // Tenta mapear a string recebida para um KeyCodes conhecido
     const command = KEY_MAP[data] || null;
 
-    // Se não encontrou mapeamento → ignora silenciosamente (ou loga para debug)
     if (!command) {
-      // console.log('[InputHandler] Tecla não mapeada:', data, buffer.toString('hex'));
       return;
     }
 
     const event: InputEvent = { command, raw: buffer };
 
-    // Dispara todos os listeners registrados
     for (const listener of this.listeners) {
       listener(event);
     }
 
-    // Tratamento especial para Ctrl+C (pode ser movido para fora se preferir)
     if (command === KeyCodes.CTRL_C) {
       console.log('\nSaindo...');
       this.stop();
@@ -82,24 +76,20 @@ start() {
     }
   };
 
-  // Registra um novo listener
   addListener(callback: (event: InputEvent) => void) {
     this.listeners.add(callback);
   }
 
-  // Remove um listener específico
   removeListener(callback: (event: InputEvent) => void) {
     this.listeners.delete(callback);
   }
 
-  // Opcional: remove todos os listeners (útil em cenários raros)
   clearListeners() {
     this.listeners.clear();
   }
 }
 
 export class Navigator {
-  // Retorna o novo currentPos ou null (se não mudou ou comando irrelevante)
   calculateNewPosition(
     command: KeyCodes | null,
     currentPos: number,
@@ -114,7 +104,7 @@ export class Navigator {
 
     switch (command) {
       case KeyCodes.UP:
-      case KeyCodes.LEFT:   // opcional: tratar left como up em menus lineares
+      case KeyCodes.LEFT:   // Optional: treat left as up in linear menus
         newPos--;
         break;
 
@@ -124,25 +114,21 @@ export class Navigator {
         break;
 
       default:
-        return null; // enter, esc, space... não afetam posição
+        return null;
     }
 
-    // Aplicar wrap-around (loop)
     if (wrap) {
       if (newPos < minPos) newPos = maxPos;
       if (newPos > maxPos) newPos = minPos;
     }
-    // Sem wrap → clamp (não sai dos limites)
     else {
       newPos = Math.max(minPos, Math.min(maxPos, newPos));
     }
 
-    // Só retorna se realmente mudou
     return newPos !== currentPos ? newPos : null;
   }
 
-  // Método auxiliar para converter InputEvent → KeyCodes (pode mover para InputHandler se preferir)
   getKeyCodeFromEvent(event: InputEvent): KeyCodes | null {
-    return event.command; // já está no seu InputEvent
+    return event.command;
   }
 }
