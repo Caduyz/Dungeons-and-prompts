@@ -1,5 +1,4 @@
 import { GameController } from "./controllers/GameController";
 
-const gameController = new GameController;
-
-gameController.start();
+export const game = new GameController();
+game.startGame();

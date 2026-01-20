@@ -1,9 +1,9 @@
-// Stores the keys codes
 export enum KeyCodes {
   UP = '\x1B[A',
   DOWN = '\x1B[B',
-  LEFT = '',
-  RIGHT = '',
+  RIGHT = '\x1B[C',
+  LEFT = '\x1B[D',
+
   ENTER = '\r',
   ESC = '\x1B',
   CTRL_C = '\u0003',
@@ -13,7 +13,11 @@ export enum KeyCodes {
 const KEY_MAP: Record<string, KeyCodes> = {
   '\x1B[A': KeyCodes.UP,
   '\x1B[B': KeyCodes.DOWN,
+  '\x1B[C': KeyCodes.RIGHT,
+  '\x1B[D': KeyCodes.LEFT,
+
   '\r': KeyCodes.ENTER,
+  '\n': KeyCodes.ENTER,
   ' ': KeyCodes.SPACE,
   '\x1B': KeyCodes.ESC,
   '\u0003': KeyCodes.CTRL_C
@@ -25,77 +29,120 @@ export type InputEvent = {
 };
 
 export class InputHandler {
+  stdin = process.stdin;
+  isRunning: boolean = false;
+
   private listeners = new Set<(event: InputEvent) => void>();
-  private isRunning = false;
 
-  private getCommandByKey = (buffer: Buffer) => {
-    const key = buffer.toString();
-    const command = KEY_MAP[key] ?? null;
+start() {
+  if (!this.stdin.isTTY || this.isRunning) return;
 
-    if (!command) return;
+  this.isRunning = true;
+  this.stdin.setRawMode(true);
+  this.stdin.resume();
+  this.stdin.setEncoding('utf8');           // Only for string data
 
-    const event: InputEvent = { command, raw: buffer };
-
-    for (const listener of this.listeners) {
-      listener(event);
-    }
-
-    if (command === KeyCodes.CTRL_C) {
-      this.stop();
-      process.exit();
-    }
-  };
-
-  start() {
-    if (this.isRunning) return;
-
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true);
-    }
-
-    process.stdin.resume();
-    process.stdin.on('data', this.getCommandByKey);
-    this.isRunning = true;
-  }
+  this.stdin.on('data', this.handleData.bind(this));
+}
 
   stop() {
     if (!this.isRunning) return;
 
-    process.stdin.off('data', this.getCommandByKey);
-    process.stdin.pause();
-
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(false);
-    }
-
+    this.stdin.off('data', this.handleData.bind(this));
+    this.stdin.setRawMode(false);
+    this.stdin.pause();
     this.isRunning = false;
   }
 
-  addListener(listener: (event: InputEvent) => void) {
-    this.listeners.add(listener);
+  // Método chamado toda vez que chega dado no stdin
+  private handleData = (data: string) => {
+    const buffer = Buffer.from(data, 'utf8');
+
+    // Tenta mapear a string recebida para um KeyCodes conhecido
+    const command = KEY_MAP[data] || null;
+
+    // Se não encontrou mapeamento → ignora silenciosamente (ou loga para debug)
+    if (!command) {
+      // console.log('[InputHandler] Tecla não mapeada:', data, buffer.toString('hex'));
+      return;
+    }
+
+    const event: InputEvent = { command, raw: buffer };
+
+    // Dispara todos os listeners registrados
+    for (const listener of this.listeners) {
+      listener(event);
+    }
+
+    // Tratamento especial para Ctrl+C (pode ser movido para fora se preferir)
+    if (command === KeyCodes.CTRL_C) {
+      console.log('\nSaindo...');
+      this.stop();
+      process.exit(0);
+    }
+  };
+
+  // Registra um novo listener
+  addListener(callback: (event: InputEvent) => void) {
+    this.listeners.add(callback);
   }
 
-  removeListener(listener: (event: InputEvent) => void) {
-    this.listeners.delete(listener);
+  // Remove um listener específico
+  removeListener(callback: (event: InputEvent) => void) {
+    this.listeners.delete(callback);
+  }
+
+  // Opcional: remove todos os listeners (útil em cenários raros)
+  clearListeners() {
+    this.listeners.clear();
   }
 }
 
 export class Navigator {
-  private index = 0;
+  // Retorna o novo currentPos ou null (se não mudou ou comando irrelevante)
+  calculateNewPosition(
+    command: KeyCodes | null,
+    currentPos: number,
+    minPos: number,
+    maxPos: number,
+    wrap: boolean = true
+  ): number | null {
 
-  constructor(private optionsLength: number) {
-    if (optionsLength < 1) return;
+    if (!command) return null;
+
+    let newPos = currentPos;
+
+    switch (command) {
+      case KeyCodes.UP:
+      case KeyCodes.LEFT:   // opcional: tratar left como up em menus lineares
+        newPos--;
+        break;
+
+      case KeyCodes.DOWN:
+      case KeyCodes.RIGHT:
+        newPos++;
+        break;
+
+      default:
+        return null; // enter, esc, space... não afetam posição
+    }
+
+    // Aplicar wrap-around (loop)
+    if (wrap) {
+      if (newPos < minPos) newPos = maxPos;
+      if (newPos > maxPos) newPos = minPos;
+    }
+    // Sem wrap → clamp (não sai dos limites)
+    else {
+      newPos = Math.max(minPos, Math.min(maxPos, newPos));
+    }
+
+    // Só retorna se realmente mudou
+    return newPos !== currentPos ? newPos : null;
   }
 
-  moveUp() {
-    this.index = (this.index - 1 + this.optionsLength) % this.optionsLength;
-  }
-
-  moveDown() {
-    this.index = (this.index + 1) % this.optionsLength;
-  }
-
-  getIndex() {
-    return this.index;
+  // Método auxiliar para converter InputEvent → KeyCodes (pode mover para InputHandler se preferir)
+  getKeyCodeFromEvent(event: InputEvent): KeyCodes | null {
+    return event.command; // já está no seu InputEvent
   }
 }
