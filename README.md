@@ -1,13 +1,19 @@
+<<<<<<< HEAD
 # Dungeons & Prompts *(Nome Provisório)*
 > Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando de Raw Mode e Readline para captação de entradas e navegação entre menus.  
+=======
+# Dungeons & Prompts
+> Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando do Ink para captação de entradas, navegação entre menus e renderização de interfaces estilizadas.  
+>>>>>>> 81bd3bf (refactor(navigation and menus): now the navigator and menus use Ink)
 
 ## Visão Geral
 
-Um RPG clássico com elementos de exploração, inventário, progressão de níveis e combate, tudo rodando no terminal sem dependências pesadas.  
-Foco em experiência fluida usando controle de input raw (setas, enter, esc) e renderização ANSI. __*(Pode ser que nem todas as features estejam prontas ainda)*__
+Um RPG clássico com elementos de inventário, progressão de níveis e combate, tudo rodando no terminal sem dependências pesadas.  
+Foco em experiência fluida usando controle de entrada (setas, enter, esc) e renderização de interfaces. __*(Pode ser que nem todas as features estejam prontas ainda)*__
 
 **Principais Features _(Atualmente)_**
 - Navegação por menus com setas (↑↓←→)
+- Fácil criação de menus com interfaces usando o Ink
 
 ## Instalação
 
@@ -30,21 +36,20 @@ pnpm install
 yarn install
 
 # Rode o jogo
-npm run dev
+npm run game
 ```
 ## Tecnologias utilizadas
 
 - TypeScript
-- Node.js (stdin raw mode + ANSI escape codes)
+- Ink
+- React (Ink)
 
 ## Roadmap de Features
 
-- [X] Navegação com Raw Mode
-- [ ] Sistema de criação de personagens
+- [X] Menus navegáveis com Ink
+- [X] Sistema de criação de personagens
 - [ ] Sistema de combate por turnos
 - [ ] Progressão de personagem
 - [ ] Habilidades especiais e passivas
 - [ ] Salvamento e carregamento de jogo
 - [ ] Loja *(sell/buy)*
-- [ ] Suporte a cores ANSI
-- [ ] Sons via terminal (beeps ou bibliotecas leves)
