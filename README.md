@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-# Dungeons & Prompts *(Nome Provisório)*
-> Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando de Raw Mode e Readline para captação de entradas e navegação entre menus.  
-=======
 # Dungeons & Prompts
 > Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando do Ink para captação de entradas, navegação entre menus e renderização de interfaces estilizadas.  
->>>>>>> 81bd3bf (refactor(navigation and menus): now the navigator and menus use Ink)
 
 ## Visão Geral
 
