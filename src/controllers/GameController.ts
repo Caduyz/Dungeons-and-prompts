@@ -1,10 +1,13 @@
 import { Navigator, InputHandler, KeyCodes, type InputEvent } from './NavigationController';
 import { type Menu, MainMenu } from '../ui/Menus';
+import { CharacterCreation } from '../ui/CharacterCreation';
+import type { Character } from '../core/entities/Character';
 
 export class GameController {
   input = new InputHandler();
   navigator = new Navigator();
   private currentMenu: Menu | null = null;
+  player: Character | null = null;
 
   startGame() {
     this.input.start();
@@ -15,9 +18,7 @@ export class GameController {
   }
 
   createNewSave() {
-    console.log("Creating a new save (debug only)...");
-    this.input.stop();
-    process.exit(0);
+    this.openCharacterCreation();
   }
 
   private handleGlobalInput(event: InputEvent) {
@@ -33,4 +34,9 @@ export class GameController {
     this.currentMenu = new MainMenu();
     this.currentMenu.render();
   }
+
+  openCharacterCreation() {
+    this.currentMenu = new CharacterCreation();
+    (this.currentMenu as CharacterCreation).start();
+}
 }

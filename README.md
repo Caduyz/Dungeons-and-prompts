@@ -1,4 +1,4 @@
-# Dungeons & Prompts *(Nome Provisório)*
+# Dungeons & Prompts
 > Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando de Raw Mode e Readline para captação de entradas e navegação entre menus.  
 
 ## Visão Geral
