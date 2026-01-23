@@ -34,6 +34,7 @@ export type Progression = {
 
 export type Class = {
   name: string;
+  id: string;
   description: string;
   baseAttributes: Attributes;
   classPassive?: null; // Placeholder for future expansion

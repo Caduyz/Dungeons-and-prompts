@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { render, Box, Text, Newline, useInput, useApp } from 'ink';
-import type { VerticalMenuProps } from '../types/menus.js';
+import { Box, Text, Newline, useInput } from 'ink';
+import type { VerticalMenuProps } from '../types/index.js';
 
 export function VerticalMenu(props: VerticalMenuProps) {
   const {
@@ -16,72 +16,49 @@ export function VerticalMenu(props: VerticalMenuProps) {
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-  const { exit } = useApp();
 
-  useInput((input, key) => {
+  useInput((_, key) => {
     if (key.upArrow) {
-      if (loop) {
-        setSelectedIndex((prev) => (prev === 0 ? options.length - 1 : prev - 1));
-      }
-      else {
-        setSelectedIndex((prev) => Math.max(0, prev - 1));
-      }
+      setSelectedIndex(prev =>
+        loop ? (prev === 0 ? options.length - 1 : prev - 1)
+             : Math.max(0, prev - 1)
+      );
     }
 
     if (key.downArrow) {
-      if (loop) {
-        setSelectedIndex((prev) => (prev === options.length - 1 ? 0 : prev + 1));
-      }
-      else {
-        setSelectedIndex((prev) => Math.min(options.length - 1, prev + 1));
-      }
+      setSelectedIndex(prev =>
+        loop ? (prev === options.length - 1 ? 0 : prev + 1)
+             : Math.min(options.length - 1, prev + 1)
+      );
     }
 
     if (key.return) {
-      if (!options[selectedIndex]) return;
-      console.log(`Selected: ${options[selectedIndex].title}`);
-
-      if (options[selectedIndex].id === 'exit') {
-        exit();
-      }
+      const option = options[selectedIndex];
+      option && onSelect?.(option);
     }
 
     if (key.escape) {
-      exit();
+      onCancel?.();
     }
   });
 
   return (
     <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-      <Text bold color={titleColor}>
-        {title}
-      </Text>
-      
+      <Text bold color={titleColor}>{title}</Text>
       <Newline />
-      
-      <Text dimColor>Use ↑ ↓ to navigate | Enter to select | ESC to exit</Text>
-      
+      <Text dimColor>↑ ↓ Enter | ESC</Text>
       <Newline count={2} />
 
       {options.map((option, index) => (
         <Text
           key={option.id}
-          color={index === selectedIndex ? highlightColor : 'white'}
           bold={index === selectedIndex}
+          color={index === selectedIndex ? highlightColor : 'white'}
         >
-          {index === selectedIndex ? `${indicator} ` : '  '}{option.title}
+          {index === selectedIndex ? `${indicator} ` : '  '}
+          {option.title}
         </Text>
       ))}
-
-      <Newline count={2} />
     </Box>
-  );
-}
-
-export function renderMenu(menu: VerticalMenuProps) {
-  const chosenMenu = menu;
-
-  render(
-    <VerticalMenu {...chosenMenu} />
   );
 }
