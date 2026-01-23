@@ -2,6 +2,7 @@ import type { Class } from "../../types/index.js";
 
 const WARRIOR: Class = {
   name: "Warrior",
+  id: "warrior",
   description: "A strong melee fighter with high vitality.",
   baseAttributes: {
     STR: 3,
@@ -15,6 +16,7 @@ const WARRIOR: Class = {
 
 const MAGE: Class = {
   name: "Mage",
+  id: "mage",
   description: "A spellcaster with high intelligence and low defense.",
   baseAttributes: {
     STR: 0,
@@ -28,6 +30,7 @@ const MAGE: Class = {
 
 const ARCHER: Class = {
   name: "Archer",
+  id: "archer",
   description: "A ranged fighter with high dexterity.",
   baseAttributes: {
     STR: 1,

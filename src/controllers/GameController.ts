@@ -1,5 +1,4 @@
-import { mainMenu } from "../menus/mainMenu.js";
-import { renderMenu } from "../components/VerticalMenu.js";
+import { renderer } from "../components/renderer.js";
 
 export class GameController {
   private gameIsRunning: boolean = false;
@@ -11,6 +10,6 @@ export class GameController {
   }
 
   openMainMenu() {
-    renderMenu(mainMenu);
+    renderer();
   }
 }
