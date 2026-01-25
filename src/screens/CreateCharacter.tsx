@@ -2,6 +2,7 @@ import { NameSelection } from '../components/NameSelection.js';
 import { VerticalMenu } from '../components/VerticalMenu.js';
 import { classSelectionMenu } from '../menus/index.js';
 import type { Navigator } from '../types/index.js';
+import { changeAlertState } from '../controllers/GameState.js';
 
 export const CreateCharacterScreen = (navigator: Navigator) => {
   let playerName = '';
@@ -21,7 +22,8 @@ export const CreateCharacterScreen = (navigator: Navigator) => {
                 onSelect={(option) => { 
                   console.log('Name:', playerName);     // For debugging
                   console.log('Class:', option.title);  // For debugging
-                  navigator.pop();
+                  changeAlertState(true);
+                  //navigator.pop();
                 }}
                 onCancel={() => navigator.pop()}
               />
