@@ -9,11 +9,12 @@ Foco em experiência fluida usando controle de entrada (setas, enter, esc) e ren
 **Principais Features _(Atualmente)_**
 - Navegação por menus com setas (↑↓←→)
 - Fácil criação de menus com interfaces usando o Ink
+- Inventário com divisão por abas (filtros)
 
 ## Instalação
 
 ### Pré-requisitos
-- Node.js ≥ 18
+- Node.js ≥ 20
 - npm ou pnpm / yarn
 
 ### Passos
@@ -43,6 +44,7 @@ npm run game
 
 - [X] Menus navegáveis com Ink
 - [X] Sistema de criação de personagens
+- [X] Sistema de inventário
 - [ ] Sistema de combate por turnos
 - [ ] Progressão de personagem
 - [ ] Habilidades especiais e passivas

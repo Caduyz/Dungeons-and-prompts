@@ -1,35 +1,39 @@
 import { useState } from 'react';
-import { Box, Text, Newline, useInput, Static, render } from 'ink';
-import type { VerticalMenuProps } from '../types/index.js';
-import { Alert, Select } from '@inkjs/ui';
-
-enum ItemType {
-  Consumable = 'Consumable',
-  Equipment = 'Equipment',
-}
-
-type Item = {
-  id: string;
-  type: ItemType;
-  name: string;
-  description: string;
-}
-
-const GameItems: Item[] = [ // Only for testing purposes
-  {id: 'health-potion', type: ItemType.Consumable, name: 'Health Potion', description: 'A simple health potion.'},
-  {id: 'mana-potion', type: ItemType.Consumable, name: 'Mana Potion', description: 'A simple mana potion.'},
-  {id: 'fallen-star', type: ItemType.Consumable, name: 'Fallen Star', description: 'A fallen star from the sky.'},
-  {id: 'long-sword', type: ItemType.Equipment, name: 'Long Sword', description: 'A sturdy long sword.'},
-  {id: 'iron-helmet', type: ItemType.Equipment, name: 'Iron Helmet', description: 'A basic iron helmet.'}
-]
+import { Box, Text, Newline, useInput, render } from 'ink';
+import { Select } from '@inkjs/ui';
+import type { ItemBase, Item, Weapon, Armor, Consumable, Material } from '../types/index.js';
+import { ItemType } from '../types/index.js';
+import { player } from "../launcher.js";
+import { itemRegistry } from '../data/items.js';
 
 type InventoyProps = {
   title: string;
   titleColor?: string; // default: 'yellow'
-  items: Item[];
+  items: ItemBase[];
   onUseItem: (itemId: string) => void;
   onClose: () => void;
 };
+
+type InventoryFilter =
+  | 'Consumables'
+  | 'Materials'
+  | 'Weapons'
+  | 'Armors';
+
+const leftMove: Record<InventoryFilter, InventoryFilter> = {
+  Consumables: 'Materials',
+  Materials: 'Weapons',
+  Weapons: 'Armors',
+  Armors: 'Consumables',
+};
+
+const rightMove: Record<InventoryFilter, InventoryFilter> = {
+  Consumables: 'Armors',
+  Armors: 'Weapons',
+  Weapons: 'Materials',
+  Materials: 'Consumables',
+};
+
 
 export function Inventory(props: InventoyProps) {
   const {
@@ -41,17 +45,25 @@ export function Inventory(props: InventoyProps) {
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState<'Consumables' | 'Equipment'>('Consumables');
+  const [selectedFilter, setSelectedFilter] = useState<InventoryFilter>('Consumables');
 
   // Don't worry, this isn't definitive, I'll polish it later.
-  let filteredItems: Item[] = [];
+  let filteredItems: ItemBase[] = [];
 
   if (selectedFilter === 'Consumables') {
     filteredItems = items.filter(item => item.type === ItemType.Consumable);
   }
 
-  else if (selectedFilter === 'Equipment') {
-    filteredItems = items.filter(item => item.type === ItemType.Equipment);
+  else if (selectedFilter === 'Armors') {
+    filteredItems = items.filter(item => item.type === ItemType.Armor);
+  }
+
+  else if (selectedFilter === 'Weapons') {
+    filteredItems = items.filter(item => item.type === ItemType.Weapon);
+  }
+
+  else if (selectedFilter === 'Materials') {
+    filteredItems = items.filter(item => item.type === ItemType.Material);
   }
     
   const selectedOptions = filteredItems.map(item => ({
@@ -75,27 +87,24 @@ export function Inventory(props: InventoyProps) {
       onClose();
     }
     if (key.leftArrow) {
-      if (selectedFilter === 'Equipment') {
-        setSelectedFilter('Consumables');
-        setSelectedIndex(0);
+      setSelectedIndex(0)
+      setSelectedFilter(leftMove[selectedFilter]);
       }
-      else {
-        return;
-      }
-    }
     if (key.rightArrow) {
-      if (selectedFilter === 'Consumables') {
-        setSelectedFilter('Equipment');
-        setSelectedIndex(0);
-      }
-      else {
-        return;
-      }    
+      setSelectedIndex(0)
+      setSelectedFilter(rightMove[selectedFilter]);
     }
   });
 
   if (selectedFilter === 'Consumables') {
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);
+    const filteredItems = items.filter((item): item is Consumable => item.type === ItemType.Consumable);    
+
+    const selectedOptions = filteredItems.map(item => ({
+      label: item.name,
+      value: item.id,
+    }));
+
+    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
 
     return (
       <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
@@ -103,9 +112,13 @@ export function Inventory(props: InventoyProps) {
         <Newline />
         <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
         <Newline />
-        <Text>Item Description</Text>
-        <Text dimColor>▶ {selectedItem!.description}</Text>
-        <Newline />
+        {selectedItem && (
+          <>
+            <Text>Item Description</Text>
+            <Text dimColor>▶ {selectedItem.description}</Text>
+            <Newline />
+          </>
+        )}
 
         {filteredItems.length === 0 ? (
           <Text color="red">No consumable items available.</Text>
@@ -118,24 +131,30 @@ export function Inventory(props: InventoyProps) {
         )}
       </Box>
     );
-  } else {
-    const filteredItems = items.filter(item => item.type === ItemType.Equipment);
+  } 
+  else if (selectedFilter === 'Armors') {
+    const filteredItems = items.filter((item): item is Armor => item.type === ItemType.Armor);    
     
     const selectedOptions = filteredItems.map(item => ({
       label: item.name,
       value: item.id,
     }));
 
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);
+    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
     return (
       <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-        <Text bold color={titleColor}>{title} - Equipment</Text>
+        <Text bold color={titleColor}>{title} - Armors</Text>
         <Newline />
         <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
         <Newline />
-        <Text>Item Description</Text>
-        <Text dimColor>▶ {selectedItem!.description}</Text>
-        <Newline />
+        {selectedItem && (
+          <>
+            <Text>Item Description</Text>
+            <Text dimColor>▶ {selectedItem.description}</Text>
+            <Text dimColor color={'blue'}>▶ Defense: {selectedItem.defense}</Text>
+            <Newline />
+          </>
+        )}
 
         {filteredItems.length === 0 ? (
           <Text color="red">No equipment items available.</Text>
@@ -149,17 +168,102 @@ export function Inventory(props: InventoyProps) {
       </Box>
     );
   }
+  else if (selectedFilter === 'Weapons') {
+    const filteredItems = items.filter((item): item is Weapon => item.type === ItemType.Weapon);
+
+    const selectedOptions = filteredItems.map(item => ({
+      label: item.name,
+      value: item.id,
+    }));
+
+    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
+    
+    return (
+      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
+        <Text bold color={titleColor}>{title} - Weapon</Text>
+        <Newline />
+        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
+        <Newline />
+        {selectedItem && (
+          <>
+            <Text>Weapon Description</Text>
+            <Text dimColor>▶ {selectedItem.description}</Text>
+            <Text dimColor color={'red'}>▶ Damage: {selectedItem.damage}</Text>
+            <Newline />
+          </>
+        )}
+
+        {filteredItems.length === 0 ? (
+          <Text color="red">No equipment items available.</Text>
+        ) : (
+          <Select 
+            options={selectedOptions}
+            onChange={newValue => {
+            }}
+          />
+        )}
+      </Box>
+    );
+  }
+  else if (selectedFilter === 'Materials') {
+    const filteredItems = items.filter((item): item is Material => item.type === ItemType.Material);
+    
+    const selectedOptions = filteredItems.map(item => ({
+      label: item.name,
+      value: item.id,
+    }));
+
+    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
+    return (
+      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
+        <Text bold color={titleColor}>{title} - Material</Text>
+        <Newline />
+        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
+        <Newline />
+        {selectedItem && (
+          <>
+            <Text>Material Description</Text>
+            <Text dimColor>▶ {selectedItem.description}</Text>
+            <Newline />
+          </>
+        )}
+
+        {filteredItems.length === 0 ? (
+          <Text color="red">No material items available.</Text>
+        ) : (
+          <Select 
+            options={selectedOptions}
+            onChange={newValue => {
+            }}
+          />
+        )}
+      </Box>
+    );
+  }
 }
 
-render(
-  <Inventory 
-    title="Inventory"
-    items={GameItems}
-    onUseItem={(itemId) => {
-      console.log(`Used item: ${itemId}`);
-    }}
-    onClose={() => {
-      console.log('Inventory closed');
-    }}
-  />
-);
+export function renderInventory() {
+  render(
+    <Inventory 
+      title="Inventory"
+      items={getItemById()}
+      onUseItem={(itemId) => {
+        console.log(`Used item: ${itemId}`);
+      }}
+      onClose={() => {
+        console.log('Inventory closed');
+      }}
+    />
+  );
+}
+
+function getItemById() {
+  let playerItems: ItemBase[] = []
+
+  for (const itemId in player.inventory) {
+    const item = itemRegistry[itemId]!;
+    playerItems.push(item);
+  }
+
+  return playerItems;
+}
