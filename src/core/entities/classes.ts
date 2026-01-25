@@ -1,6 +1,6 @@
 import type { Class } from "../../types/index.js";
 
-const WARRIOR: Class = {
+export const WARRIOR: Class = {
   name: "Warrior",
   id: "warrior",
   description: "A strong melee fighter with high vitality.",
@@ -14,7 +14,7 @@ const WARRIOR: Class = {
   }
 };
 
-const MAGE: Class = {
+export const MAGE: Class = {
   name: "Mage",
   id: "mage",
   description: "A spellcaster with high intelligence and low defense.",
@@ -28,7 +28,7 @@ const MAGE: Class = {
   }
 };
 
-const ARCHER: Class = {
+export const ARCHER: Class = {
   name: "Archer",
   id: "archer",
   description: "A ranged fighter with high dexterity.",

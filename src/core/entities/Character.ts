@@ -1,4 +1,5 @@
 import type { Attributes, Entity, Vitals, Class, Progression } from '../../types/index.js';
+import { itemRegistry } from '../../data/items.js';
 
 export class Character implements Entity {
   name: string;
@@ -6,6 +7,9 @@ export class Character implements Entity {
   attributes: Attributes;
   vital: Vitals;
   class: Class;
+  coins: number = 0;
+
+  inventory: { [itemId: string]: number } = {}; // itemId -> quantity 
 
   constructor(name: string, characterClass: Class) {
     this.name = name;
@@ -42,5 +46,52 @@ export class Character implements Entity {
 
   getVitalByAttribute(attribute: number): number { // Vital = Mana or Health derived from attributes
     return attribute * 5;
+  }
+
+  addItemToInventory(itemId: string, quantity: number = 1): void {
+    if (this.inventory[itemId]) {
+      this.inventory[itemId] += quantity;
+    } else {
+      this.inventory[itemId] = quantity;
+    }
+  }
+
+  removeItemFromInventory(itemId: string, quantity: number = 1): boolean {
+    if (this.inventory[itemId] && this.inventory[itemId] >= quantity) {
+      this.inventory[itemId] -= quantity;
+      if (this.inventory[itemId] === 0) {
+        delete this.inventory[itemId];
+      }
+      return true;
+    }
+    return false;
+  }
+
+  checkItemByInventory() {
+    const tableData = [];
+
+    for (const itemId in this.inventory) {
+      const quantity = this.inventory[itemId];
+      const item = itemRegistry[itemId];
+
+      if (!item) {
+        tableData.push({
+          id: itemId,
+          error: 'Item not found in registry',
+          quantity,
+        });
+        continue;
+      }
+
+      tableData.push({
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        quantity,
+        description: item.description,
+      });
+    }
+
+    console.table(tableData);
   }
 }
