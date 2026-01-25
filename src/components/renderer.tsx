@@ -2,6 +2,7 @@ import { render, useApp } from 'ink';
 import { useNavigator } from '../controllers/ScreenController.js';
 import { MainMenuScreen } from '../screens/MainMenu.js';
 import { SCREEN_FPS } from '../controllers/GameState.js';
+import { useState } from 'react';
 
 const App = () => {
   const { exit } = useApp();
