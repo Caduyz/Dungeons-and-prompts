@@ -1,7 +1,6 @@
 import { NameSelection } from '../components/NameSelection.js';
 import { VerticalMenu } from '../components/VerticalMenu.js';
 import { classSelectionMenu } from '../menus/index.js';
-import type { Navigator } from '../types/index.js';
 import { changeAlertState } from '../controllers/GameState.js';
 
 export const CreateCharacterScreen = (navigator: Navigator) => {

@@ -1,23 +1,32 @@
 import { VerticalMenu } from '../components/VerticalMenu.js';
-import { CreateCharacterScreen } from './CreateCharacter.js';
-import type { Navigator } from '../types/index.js';
 import { mainMenu } from '../menus/index.js';
+import type { ScreenId } from '../types/index.js';
 
-export const MainMenuScreen = (navigator: Navigator, exit: () => void) => ({
-  id: 'main-menu',
-  render: () => (
-    <VerticalMenu {...mainMenu}
+type MainMenuProps = {
+  goTo: (screen: ScreenId) => void;
+  exit: () => void;
+};
+
+export function MainMenu({ goTo, exit }: MainMenuProps) {
+  return (
+    <VerticalMenu
+      {...mainMenu}
+      loop
       onSelect={(option) => {
-      console.log('MainMenu:', option.id); // For debugging
-      if (option.id === 'new') {
-        navigator.push(CreateCharacterScreen(navigator));
-      }
+        console.log('MainMenu:', option.id);
 
-      if (option.id === 'exit') {
-        exit();
-      }
-    }}
-    loop={true}
-  />
-  )
-});
+        if (option.id === 'new') {
+          goTo('charCreation');
+        }
+
+        if (option.id === 'inventory') {
+          goTo('inventory');
+        }
+
+        if (option.id === 'exit') {
+          exit();
+        }
+      }}
+    />
+  );
+}
