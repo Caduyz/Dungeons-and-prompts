@@ -1,3 +1,6 @@
+import type { Classes } from "../core/entities/classes.js";
+import type { Armor, BodySlot } from "./items.js";
+
 // Common for all entities in the game
 export type Attributes = {
   STR: number;
@@ -20,7 +23,6 @@ export interface Entity {
   attributes: Attributes;
   vital: Vitals;
   race?: null; // Placeholder for future expansion
-  armory?: null; // Placeholder for future expansion
 
   heal(amount: number): void;
   takeDamage(amount: number, damageType: string): void;
@@ -34,9 +36,11 @@ export type Progression = {
 
 export type Class = {
   name: string;
-  id: string;
+  id: Classes;
   description: string;
   baseAttributes: Attributes;
   classPassive?: null; // Placeholder for future expansion
   classSkills?: null; // Placeholder for future expansion
 }
+
+export type Armory = Record<BodySlot, Armor | null>;

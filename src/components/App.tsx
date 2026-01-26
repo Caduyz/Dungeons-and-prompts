@@ -4,7 +4,9 @@ import { SCREEN_FPS } from '../controllers/GameState.js';
 import { useState } from 'react';
 import { ScreenController } from '../controllers/ScreenController.js';
 import { getPlayerItems, Inventory } from './Inventory.js';
-import type { ScreenId } from '../types/index.js';
+import { ItemType, type ScreenId } from '../types/index.js';
+import { player } from '../launcher.js';
+import { itemRegistry } from '../data/items.js';
 
 function App() {
   const [screenController] = useState(() => new ScreenController());
@@ -38,7 +40,14 @@ function App() {
                 title="Inventory"
                 items={getPlayerItems()}
                 onUseItem={(itemId) => {
-                  console.log(`Used item: ${itemId}`);
+                  if (itemRegistry[itemId]?.type === ItemType.Armor) {
+                    player.equipArmor(itemId);
+                  }
+
+                  if (itemRegistry[itemId]?.type === ItemType.Consumable) {
+                    player.useItem(itemId);
+                    rerender()
+                  }
                 }}
                 onClose={goBack} 
                 />;
