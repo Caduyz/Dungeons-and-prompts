@@ -1,16 +1,10 @@
-import { useState, type JSX } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Text, Newline, useInput } from 'ink';
 import { Select } from '@inkjs/ui';
-import type { Item, Weapon, Armor, Consumable, Material, InventoryFilter, InventoryProps } from '../types/index.js';
+import type { InventoryFilter, InventoryProps, FilterConfig, InventoryItem } from '../types/index.js';
 import { ItemType } from '../types/index.js';
 import { player } from "../launcher.js";
 import { itemRegistry } from '../data/items.js';
-
-type FilterConfig = {
-  label: string;
-  index: number;
-  type: ItemType;
-};
 
 const FILTERS: Record<InventoryFilter, FilterConfig> = {
   Consumables: { label: 'Consumables', index: 1, type: ItemType.Consumable },
@@ -44,16 +38,21 @@ export function Inventory(props: InventoryProps) {
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<InventoryFilter>('Consumables');
 
   const filterConfig = FILTERS[selectedFilter];
   const filteredItems = items.filter(
-    item => item.type === filterConfig.type
+    item => item.item.type === filterConfig.type
   );
 
   const selectedItem = filteredItems[selectedIndex];
 
   useInput((_, key) => {
+    if (key.return && selectedItemId) {
+      onUseItem(selectedItemId);
+    }
+
     if (key.upArrow) {
       setSelectedIndex(i => Math.max(0, i - 1));
     }
@@ -74,6 +73,11 @@ export function Inventory(props: InventoryProps) {
 
     if (key.escape) onClose();
   });
+
+  useEffect(() => {
+    const entry = filteredItems[selectedIndex];
+    setSelectedItemId(entry ? entry.item.id : null);
+  }, [selectedIndex, filteredItems]);
   
   return(
     <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
@@ -82,21 +86,25 @@ export function Inventory(props: InventoryProps) {
       </Text>
 
       <Newline />
-      <Text dimColor>← → to switch | ↑ ↓ to navigate | ESC to close</Text>
+      <Text dimColor>← → to switch | ↑ ↓ to navigate | ESC to close | Enter to use</Text>
       <Newline />
 
 
       {selectedItem && (
         <>
           <Text>Item Description</Text>
-          <Text dimColor>▶ {selectedItem.description}</Text>
+          <Text dimColor>▶ {selectedItem.item.description}</Text>
 
-          {selectedItem.type === ItemType.Armor && (
-            <Text dimColor color="blue">▶ Defense: {selectedItem.defense}</Text>
+          {(selectedItem.item.type === ItemType.Consumable && selectedItem.item.effect === 'heal') && (
+            <Text dimColor color="blue">▶ Heal: {selectedItem.item.value} {selectedItem.item.statAffected}</Text>
           )}
 
-          {selectedItem.type === ItemType.Weapon && (
-            <Text dimColor color="red">▶ Damage: {selectedItem.damage}</Text>
+          {selectedItem.item.type === ItemType.Armor && (
+            <Text dimColor color="blue">▶ Defense: {selectedItem.item.defense}</Text>
+          )}
+
+          {selectedItem.item.type === ItemType.Weapon && (
+            <Text dimColor color="red">▶ Damage: {selectedItem.item.damage}</Text>
           )}
 
           <Newline />
@@ -107,21 +115,25 @@ export function Inventory(props: InventoryProps) {
       {filteredItems.length === 0 ? (
         <Text color="red">No items available.</Text>
       ) : (
-        <Select options={filteredItems.map(item => ({
-          label: item.name,
-          value: item.id
-        }))} />
+        <Select 
+          options={filteredItems.map(item => ({
+            label: `${item.item.name} (x${item.quantity})`,
+            value: item.item.id
+        }))}
+          onChange={setSelectedItemId}
+        />
       )}
     </Box>
   ) 
 }
 
-function isItem(item: Item | undefined): item is Item {
-  return item !== undefined;
-}
+export function getPlayerItems(): InventoryItem[] {
+  return Object.entries(player.inventory)
+    .map(([id, quantity]) => {
+      const item = itemRegistry[id];
+      if (!item) return null;
 
-export function getPlayerItems(): Item[] {
-  return Object.keys(player.inventory)
-    .map(id => itemRegistry[id])
-    .filter(isItem);
+      return { item, quantity };
+    })
+    .filter(Boolean) as InventoryItem[];  
 }

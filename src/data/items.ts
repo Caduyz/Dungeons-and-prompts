@@ -1,11 +1,20 @@
-import type { Item, Armor, Weapon, Material, Consumable, ItemType } from "../types/index.js";
+import fs from 'fs'
+import type { Item } from "../types/index.js"
+import path from 'path'
+
+const itemsPath = path.resolve('src/data/items.json');
+
+const raw = fs.readFileSync(itemsPath, 'utf-8');
+const parsed = JSON.parse(raw) as Record<string, Item>;
 
 export const itemRegistry: Record<string, Item> = {};
 
-export function createItem(item: Item | Armor | Weapon | Material | Consumable) {
-  if (itemRegistry[item.id]) {
-    throw new Error(`Item ${item.id} already exists`);
+for (const [id, item] of Object.entries(parsed)) {
+  if (itemRegistry[id]) {
+    throw new Error(`Duplicate item id: ${id}`);
   }
 
-  itemRegistry[item.id] = item;
+  itemRegistry[id] = item;
 }
+
+console.log(itemRegistry);

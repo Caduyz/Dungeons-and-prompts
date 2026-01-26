@@ -1,4 +1,4 @@
-import type { Item } from "./items.js";
+import type { InventoryItem } from "../components/Inventory.js";
 
 export type ScreenId =
   | 'mainMenu'
@@ -12,7 +12,7 @@ export type ScreenId =
 export type InventoryProps = {
   title: string;
   titleColor?: string; // default: 'yellow'
-  items: Item[];
+  items: InventoryItem[];
   onUseItem: (itemId: string) => void;
   onClose: () => void;
 };

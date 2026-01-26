@@ -1,5 +1,6 @@
-import type { Attributes, Entity, Vitals, Class, Progression } from '../../types/index.js';
+import { type Attributes, type Entity, type Vitals, type Class, type Progression, ItemType, BodySlot, type Armory } from '../../types/index.js';
 import { itemRegistry } from '../../data/items.js';
+import { Classes } from './classes.js';
 
 export class Character implements Entity {
   name: string;
@@ -10,6 +11,13 @@ export class Character implements Entity {
   coins: number = 0;
 
   inventory: { [itemId: string]: number } = {}; // itemId -> quantity 
+  armory: Armory = {
+    [BodySlot.Head]: null,
+    [BodySlot.Chest]: null,
+    [BodySlot.Legs]: null,
+    [BodySlot.Hands]: null,
+    [BodySlot.Feet]: null,
+  };
 
   constructor(name: string, characterClass: Class) {
     this.name = name;
@@ -67,7 +75,7 @@ export class Character implements Entity {
     return false;
   }
 
-  checkItemByInventory() {
+  checkItemByInventory() { // Debugging only
     const tableData = [];
 
     for (const itemId in this.inventory) {
@@ -93,5 +101,44 @@ export class Character implements Entity {
     }
 
     console.table(tableData);
+  }
+
+  useItem(itemId: string) {
+    if (!this.inventory[itemId]) return
+
+    this.inventory[itemId]--
+    if (this.inventory[itemId] === 0) {
+      delete this.inventory[itemId]
+    }
+  }
+
+  equipArmor(itemId: string) {
+    const armor = this.getItemById(itemId)
+    if (armor.type !== ItemType.Armor) {
+      console.log("This item can't be equipped!");
+      return;
+    }
+    if (!(armor.availableClasses.includes(this.class.id)) && !(armor.availableClasses.includes(Classes.ALL))) {
+      console.log("Your class can't equip this armor!")
+    }
+    
+    const slot = armor.equippableSlot;
+    
+    if (this.armory[slot] === armor) {
+      console.log('Armor already equipped!')
+      return;
+    }
+
+    else {
+      this.armory[slot] = armor;
+      console.log(this.armory)
+    }
+  }
+
+  getItemById(itemId: string) {
+    if (!itemRegistry[itemId]) {
+      throw new Error("Item not found.") 
+    }
+    return itemRegistry[itemId];
   }
 }

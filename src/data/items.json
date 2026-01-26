@@ -1,0 +1,83 @@
+{
+  "health-potion": {
+    "id": "health-potion",
+    "type": "consumable",
+    "effect": "heal",
+    "statAffected": "HP",
+    "value": 25,
+    "name": "Health Potion",
+    "description": "A simple health potion."
+  },
+  "slime-ball": {
+    "id": "slime-ball",
+    "type": "material",
+    "name": "Slime Ball",
+    "description": "Slime Ball"
+  },
+  "iron-helmet": {
+    "id": "iron-helmet",
+    "type": "armor",
+    "name": "Iron Helmet",
+    "equippableSlot": "head",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A warrior helmet made of iron.",
+    "defense": 5
+  },
+  "iron-sword": {
+    "id": "iron-sword",
+    "type": "weapon",
+    "name": "Iron Sword",
+    "mainAttribute": "strength",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A long sword made of iron.",
+    "damage": 8
+  },
+  "iron-chestplate": {
+    "id": "iron-chestplate",
+    "type": "armor",
+    "name": "Iron Chestplate",
+    "equippableSlot": "chest",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A warrior chesplate made of iron.",
+    "defense": 12
+  },
+  "iron-greaves": {
+    "id": "iron-greaves",
+    "type": "armor",
+    "name": "Iron Greaves",
+    "equippableSlot": "legs",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A warrior greaves made of iron.",
+    "defense": 7
+  },
+  "iron-gauntlets": {
+    "id": "iron-gauntlets",
+    "type": "armor",
+    "name": "Iron Gauntlets",
+    "equippableSlot": "hands",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A warrior gauntlets made of iron.",
+    "defense": 4
+  },
+  "iron-boots": {
+    "id": "iron-boots",
+    "type": "armor",
+    "name": "Iron Boots",
+    "equippableSlot": "feet",
+    "availableClasses": [
+      "warrior"
+    ],
+    "description": "A warrior boots made of iron.",
+    "defense": 4
+  }
+}

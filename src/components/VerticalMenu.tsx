@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Box, Text, Newline, useInput, Static } from 'ink';
+import { Box, Text, Newline, useInput } from 'ink';
 import type { VerticalMenuProps } from '../types/index.js';
-import { showAlert, changeAlertState } from '../controllers/GameState.js';
+import { showAlert } from '../controllers/GameState.js';
 import { Alert } from '@inkjs/ui';
 
 export function VerticalMenu(props: VerticalMenuProps) {

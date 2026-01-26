@@ -1,8 +1,15 @@
 import type { Class } from "../../types/index.js";
 
+export enum Classes {
+  WARRIOR = 'warrior',
+  ARCHER = 'archer',
+  MAGE = 'mage',
+  ALL = 'all'
+}
+
 export const WARRIOR: Class = {
   name: "Warrior",
-  id: "warrior",
+  id: Classes.WARRIOR,
   description: "A strong melee fighter with high vitality.",
   baseAttributes: {
     STR: 3,
@@ -16,7 +23,7 @@ export const WARRIOR: Class = {
 
 export const MAGE: Class = {
   name: "Mage",
-  id: "mage",
+  id: Classes.MAGE,
   description: "A spellcaster with high intelligence and low defense.",
   baseAttributes: {
     STR: 0,
@@ -30,7 +37,7 @@ export const MAGE: Class = {
 
 export const ARCHER: Class = {
   name: "Archer",
-  id: "archer",
+  id: Classes.ARCHER,
   description: "A ranged fighter with high dexterity.",
   baseAttributes: {
     STR: 1,
