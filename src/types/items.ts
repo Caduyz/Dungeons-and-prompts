@@ -1,8 +1,18 @@
+import type { Class } from "./entities.js";
+
 export enum ItemType {
   Consumable,
   Armor,
   Weapon,
   Material
+}
+
+export enum BodySlot {
+  Head,
+  Chest,
+  Legs,
+  Feet,
+  Hands
 }
 
 export interface ItemBase {
@@ -15,8 +25,8 @@ export interface ItemBase {
 export interface Armor extends ItemBase {
   type: ItemType.Armor;
   defense: number;
-  equippableSlot: 'head' | 'chest' | 'legs' | 'feet' | 'hands';
-  availableClasses: string[];
+  equippableSlot: BodySlot;
+  availableClasses: Class[];
   recipe?: { itemId: string; quantity: number }[];
   price?: number;
 }
@@ -25,7 +35,7 @@ export interface Weapon extends ItemBase {
   type: ItemType.Weapon;
   damage: number;
   mainAttribute: 'strength' | 'dexterity' | 'intelligence';
-  availableClasses: string[];
+  availableClasses: Class[];
   recipe?: { itemId: string; quantity: number }[];
   price?: number;
 }

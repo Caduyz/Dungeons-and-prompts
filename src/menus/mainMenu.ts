@@ -1,7 +1,8 @@
 import type { MenuOption, VerticalMenuProps } from "../types/index.js";
 
 const mainMenuOptions: MenuOption[] = [
-  { id: 'new', title: 'New Game' },
+  { id: 'newGame', title: 'New Game' },
+  { id: 'inventory', title: 'Inventory' },
   { id: 'exit', title: 'Exit' },
 ]
 

@@ -1,8 +1,8 @@
-import type { ItemBase, Armor, Weapon, Material, Consumable, ItemType } from "../types/index.js";
+import type { Item, Armor, Weapon, Material, Consumable, ItemType } from "../types/index.js";
 
-export const itemRegistry: Record<string, ItemBase> = {};
+export const itemRegistry: Record<string, Item> = {};
 
-export function createItem(item: ItemBase | Armor | Weapon | Material | Consumable) {
+export function createItem(item: Item | Armor | Weapon | Material | Consumable) {
   if (itemRegistry[item.id]) {
     throw new Error(`Item ${item.id} already exists`);
   }

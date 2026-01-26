@@ -1,18 +1,21 @@
-import { renderer } from "../components/renderer.js";
 import { createItem } from "../data/items.js";
-import { ItemType } from "../types/index.js";
+import { BodySlot, ItemType } from "../types/index.js";
 import { player } from "../launcher.js";
-import { renderInventory } from "../components/Inventory.js";
+import { renderApp } from "../components/App.js";
+import { CLASSES } from '../core/entities/classes.js'
 
 export class GameController {
   private gameIsRunning: boolean = false;
 
   startGame() {
     this.gameIsRunning = true;
+    console.clear()
 
+    // Debugging only
     createItem({
       id: 'health-potion',
       type: ItemType.Consumable,
+      effect: 'none',
       name: 'Health Potion',
       description: 'A simple health potion.',
     })
@@ -26,22 +29,28 @@ export class GameController {
       id: 'iron-helmet',
       type: ItemType.Armor,
       name: 'Iron Helmet',
-      description: 'Iron Helmet',
-      defense: 10
+      equippableSlot: BodySlot.Head,
+      availableClasses: CLASSES,
+      description: 'A warrior helmet made of iron.',
+      defense: 5
     })
     createItem({
       id: 'iron-sword',
       type: ItemType.Weapon,
       name: 'Iron Sword',
-      description: 'Iron Sword',
-      damage: 10
+      mainAttribute: 'strength',
+      availableClasses: CLASSES,
+      description: 'A long sword made of iron.',
+      damage: 8
     })
     createItem({
       id: 'iron-chestplate',
       type: ItemType.Armor,
       name: 'Iron Chestplate',
-      description: 'Iron Chestplate',
-      defense: 15
+      equippableSlot: BodySlot.Chest,
+      availableClasses: CLASSES,
+      description: 'A warrior chesplate made of iron.',
+      defense: 12
     })
 
     player.addItemToInventory('health-potion', 10)
@@ -49,10 +58,11 @@ export class GameController {
     player.addItemToInventory('iron-sword', 1)
     player.addItemToInventory('iron-helmet', 1)
     player.addItemToInventory('iron-chestplate', 1)
-    renderInventory()
+
+    this.openMainMenu()
   }
 
   openMainMenu() {
-    renderer();
+    renderApp();
   }
 }

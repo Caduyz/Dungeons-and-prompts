@@ -1,12 +1,24 @@
-import type { ReactNode } from "react";
+import type { Item } from "./items.js";
 
-export type Screen = {
-  id: string;
-  render: () => ReactNode;
+export type ScreenId =
+  | 'mainMenu'
+  | 'inventory'
+  | 'battle'
+  | 'dialog'
+  | 'pause'
+  | 'charCreation';
+
+// Inventory Only
+export type InventoryProps = {
+  title: string;
+  titleColor?: string; // default: 'yellow'
+  items: Item[];
+  onUseItem: (itemId: string) => void;
+  onClose: () => void;
 };
 
-export type Navigator = {
-  current: Screen;
-  push: (screen: Screen) => void;
-  pop: () => void;
-};
+export type InventoryFilter =
+  | 'Consumables'
+  | 'Materials'
+  | 'Weapons'
+  | 'Armors';

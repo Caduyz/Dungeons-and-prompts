@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { Box, Text, Newline, useInput, render } from 'ink';
+import { useState, type JSX } from 'react';
+import { Box, Text, Newline, useInput } from 'ink';
 import { Select } from '@inkjs/ui';
-import type { ItemBase, Item, Weapon, Armor, Consumable, Material } from '../types/index.js';
+import type { Item, Weapon, Armor, Consumable, Material, InventoryFilter, InventoryProps } from '../types/index.js';
 import { ItemType } from '../types/index.js';
 import { player } from "../launcher.js";
 import { itemRegistry } from '../data/items.js';
 
-type InventoyProps = {
-  title: string;
-  titleColor?: string; // default: 'yellow'
-  items: ItemBase[];
-  onUseItem: (itemId: string) => void;
-  onClose: () => void;
+type FilterConfig = {
+  label: string;
+  index: number;
+  type: ItemType;
 };
 
-type InventoryFilter =
-  | 'Consumables'
-  | 'Materials'
-  | 'Weapons'
-  | 'Armors';
+const FILTERS: Record<InventoryFilter, FilterConfig> = {
+  Consumables: { label: 'Consumables', index: 1, type: ItemType.Consumable },
+  Armors:      { label: 'Armors',      index: 2, type: ItemType.Armor },
+  Weapons:     { label: 'Weapons',     index: 3, type: ItemType.Weapon },
+  Materials:   { label: 'Materials',   index: 4, type: ItemType.Material },
+};
+
 
 const leftMove: Record<InventoryFilter, InventoryFilter> = {
   Consumables: 'Materials',
@@ -34,8 +34,7 @@ const rightMove: Record<InventoryFilter, InventoryFilter> = {
   Materials: 'Consumables',
 };
 
-
-export function Inventory(props: InventoyProps) {
+export function Inventory(props: InventoryProps) {
   const {
     title = 'Inventory',
     titleColor = 'yellow',
@@ -47,223 +46,82 @@ export function Inventory(props: InventoyProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState<InventoryFilter>('Consumables');
 
-  // Don't worry, this isn't definitive, I'll polish it later.
-  let filteredItems: ItemBase[] = [];
+  const filterConfig = FILTERS[selectedFilter];
+  const filteredItems = items.filter(
+    item => item.type === filterConfig.type
+  );
 
-  if (selectedFilter === 'Consumables') {
-    filteredItems = items.filter(item => item.type === ItemType.Consumable);
-  }
+  const selectedItem = filteredItems[selectedIndex];
 
-  else if (selectedFilter === 'Armors') {
-    filteredItems = items.filter(item => item.type === ItemType.Armor);
-  }
-
-  else if (selectedFilter === 'Weapons') {
-    filteredItems = items.filter(item => item.type === ItemType.Weapon);
-  }
-
-  else if (selectedFilter === 'Materials') {
-    filteredItems = items.filter(item => item.type === ItemType.Material);
-  }
-    
-  const selectedOptions = filteredItems.map(item => ({
-    label: item.name,
-    value: item.id,
-  }));
-
-  useInput((data, key) => {
+  useInput((_, key) => {
     if (key.upArrow) {
-      setSelectedIndex(prev =>
-        Math.max(0, prev - 1)
-      );
+      setSelectedIndex(i => Math.max(0, i - 1));
     }
 
     if (key.downArrow) {
-      setSelectedIndex(prev =>
-        Math.min(selectedOptions.length - 1, prev + 1)
-      );
+      setSelectedIndex(i => Math.min(filteredItems.length - 1, i + 1));
     }
-    if (key.escape) {
-      onClose();
-    }
+
     if (key.leftArrow) {
-      setSelectedIndex(0)
+      setSelectedIndex(0);
       setSelectedFilter(leftMove[selectedFilter]);
-      }
+    }
+
     if (key.rightArrow) {
-      setSelectedIndex(0)
+      setSelectedIndex(0);
       setSelectedFilter(rightMove[selectedFilter]);
     }
+
+    if (key.escape) onClose();
   });
+  
+  return(
+    <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
+      <Text bold color={titleColor}>
+        {title} - {filterConfig.label} [{filterConfig.index} / 4]
+      </Text>
 
-  if (selectedFilter === 'Consumables') {
-    const filteredItems = items.filter((item): item is Consumable => item.type === ItemType.Consumable);    
+      <Newline />
+      <Text dimColor>← → to switch | ↑ ↓ to navigate | ESC to close</Text>
+      <Newline />
 
-    const selectedOptions = filteredItems.map(item => ({
-      label: item.name,
-      value: item.id,
-    }));
 
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
+      {selectedItem && (
+        <>
+          <Text>Item Description</Text>
+          <Text dimColor>▶ {selectedItem.description}</Text>
 
-    return (
-      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-        <Text bold color={titleColor}>{title} - Consumables</Text>
-        <Newline />
-        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
-        <Newline />
-        {selectedItem && (
-          <>
-            <Text>Item Description</Text>
-            <Text dimColor>▶ {selectedItem.description}</Text>
-            <Newline />
-          </>
-        )}
+          {selectedItem.type === ItemType.Armor && (
+            <Text dimColor color="blue">▶ Defense: {selectedItem.defense}</Text>
+          )}
 
-        {filteredItems.length === 0 ? (
-          <Text color="red">No consumable items available.</Text>
-        ) : (
-          <Select 
-            options={selectedOptions}
-            onChange={newValue => {
-            }}
-          />
-        )}
-      </Box>
-    );
-  } 
-  else if (selectedFilter === 'Armors') {
-    const filteredItems = items.filter((item): item is Armor => item.type === ItemType.Armor);    
-    
-    const selectedOptions = filteredItems.map(item => ({
-      label: item.name,
-      value: item.id,
-    }));
+          {selectedItem.type === ItemType.Weapon && (
+            <Text dimColor color="red">▶ Damage: {selectedItem.damage}</Text>
+          )}
 
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
-    return (
-      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-        <Text bold color={titleColor}>{title} - Armors</Text>
-        <Newline />
-        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
-        <Newline />
-        {selectedItem && (
-          <>
-            <Text>Item Description</Text>
-            <Text dimColor>▶ {selectedItem.description}</Text>
-            <Text dimColor color={'blue'}>▶ Defense: {selectedItem.defense}</Text>
-            <Newline />
-          </>
-        )}
+          <Newline />
+        </>
+      )}
 
-        {filteredItems.length === 0 ? (
-          <Text color="red">No equipment items available.</Text>
-        ) : (
-          <Select 
-            options={selectedOptions}
-            onChange={newValue => {
-            }}
-          />
-        )}
-      </Box>
-    );
-  }
-  else if (selectedFilter === 'Weapons') {
-    const filteredItems = items.filter((item): item is Weapon => item.type === ItemType.Weapon);
 
-    const selectedOptions = filteredItems.map(item => ({
-      label: item.name,
-      value: item.id,
-    }));
-
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
-    
-    return (
-      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-        <Text bold color={titleColor}>{title} - Weapon</Text>
-        <Newline />
-        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
-        <Newline />
-        {selectedItem && (
-          <>
-            <Text>Weapon Description</Text>
-            <Text dimColor>▶ {selectedItem.description}</Text>
-            <Text dimColor color={'red'}>▶ Damage: {selectedItem.damage}</Text>
-            <Newline />
-          </>
-        )}
-
-        {filteredItems.length === 0 ? (
-          <Text color="red">No equipment items available.</Text>
-        ) : (
-          <Select 
-            options={selectedOptions}
-            onChange={newValue => {
-            }}
-          />
-        )}
-      </Box>
-    );
-  }
-  else if (selectedFilter === 'Materials') {
-    const filteredItems = items.filter((item): item is Material => item.type === ItemType.Material);
-    
-    const selectedOptions = filteredItems.map(item => ({
-      label: item.name,
-      value: item.id,
-    }));
-
-    const selectedItem = filteredItems.find(item => item.id === selectedOptions[selectedIndex]?.value);    
-    return (
-      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-        <Text bold color={titleColor}>{title} - Material</Text>
-        <Newline />
-        <Text dimColor>← → to switch | ↑ ↓ to navigate | Enter to use | ESC to close</Text>
-        <Newline />
-        {selectedItem && (
-          <>
-            <Text>Material Description</Text>
-            <Text dimColor>▶ {selectedItem.description}</Text>
-            <Newline />
-          </>
-        )}
-
-        {filteredItems.length === 0 ? (
-          <Text color="red">No material items available.</Text>
-        ) : (
-          <Select 
-            options={selectedOptions}
-            onChange={newValue => {
-            }}
-          />
-        )}
-      </Box>
-    );
-  }
+      {filteredItems.length === 0 ? (
+        <Text color="red">No items available.</Text>
+      ) : (
+        <Select options={filteredItems.map(item => ({
+          label: item.name,
+          value: item.id
+        }))} />
+      )}
+    </Box>
+  ) 
 }
 
-export function renderInventory() {
-  render(
-    <Inventory 
-      title="Inventory"
-      items={getItemById()}
-      onUseItem={(itemId) => {
-        console.log(`Used item: ${itemId}`);
-      }}
-      onClose={() => {
-        console.log('Inventory closed');
-      }}
-    />
-  );
+function isItem(item: Item | undefined): item is Item {
+  return item !== undefined;
 }
 
-function getItemById() {
-  let playerItems: ItemBase[] = []
-
-  for (const itemId in player.inventory) {
-    const item = itemRegistry[itemId]!;
-    playerItems.push(item);
-  }
-
-  return playerItems;
+export function getPlayerItems(): Item[] {
+  return Object.keys(player.inventory)
+    .map(id => itemRegistry[id])
+    .filter(isItem);
 }
