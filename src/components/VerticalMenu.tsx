@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Box, Text, Newline, useInput } from 'ink';
 import type { VerticalMenuProps } from '../types/index.js';
-import { showAlert } from '../controllers/GameState.js';
-import { Alert } from '@inkjs/ui';
 
 export function VerticalMenu(props: VerticalMenuProps) {
   const {
@@ -18,7 +16,6 @@ export function VerticalMenu(props: VerticalMenuProps) {
   } = props;
 
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-  const [state, setState] = useState<boolean>(false);
   
   useInput((_, key) => {
     if (key.upArrow) {
@@ -62,12 +59,6 @@ export function VerticalMenu(props: VerticalMenuProps) {
           {option.title}
         </Text> 
       ))}
-
-      {showAlert && (
-        <Alert variant='success' title='Character Created'>
-          <Text>Character created successfully!</Text>
-        </Alert>
-      )}
     </Box>
   );
 }

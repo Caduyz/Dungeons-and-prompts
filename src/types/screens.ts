@@ -1,4 +1,4 @@
-import type { InventoryItem } from "../components/Inventory.js";
+import type { InventoryItem } from "../types/index.js";
 
 export type ScreenId =
   | 'mainMenu'
@@ -6,7 +6,8 @@ export type ScreenId =
   | 'battle'
   | 'dialog'
   | 'pause'
-  | 'charCreation';
+  | 'nameSelection'
+  | 'classSelection';
 
 // Inventory Only
 export type InventoryProps = {

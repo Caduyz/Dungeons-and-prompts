@@ -49,4 +49,11 @@ export const ARCHER: Class = {
   }
 };
 
+export function getClassById(classId: string): Class {
+  if (classId === 'Warrior') return WARRIOR;
+  if (classId === 'Archer') return ARCHER;
+  if (classId === 'Mage') return MAGE;
+  else return WARRIOR
+}
+
 export const CLASSES: Class[] = [WARRIOR, MAGE, ARCHER];

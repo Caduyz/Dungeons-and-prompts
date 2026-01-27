@@ -1,4 +1,3 @@
-import { player } from "../launcher.js"
 import { renderApp } from "../components/App.js"
 
 export class GameController {
@@ -8,6 +7,7 @@ export class GameController {
     this.gameIsRunning = true;
     console.clear()
 
+    /*
     player.addItemToInventory('health-potion', 10)
     player.addItemToInventory('slime-ball', 10)
     player.addItemToInventory('iron-sword', 1)
@@ -15,7 +15,7 @@ export class GameController {
     player.addItemToInventory('iron-chestplate', 1)
     player.addItemToInventory('iron-greaves', 1)
     player.addItemToInventory('iron-gauntlets', 1)
-    player.addItemToInventory('iron-boots', 1)
+    player.addItemToInventory('iron-boots', 1)*/
 
     this.openMainMenu()
   }
