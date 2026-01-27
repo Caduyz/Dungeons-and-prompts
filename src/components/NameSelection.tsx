@@ -1,25 +1,56 @@
 import { useState } from 'react';
-import { Box, Text, Newline } from 'ink';
+import { Box, Text, Newline, useInput } from 'ink';
 import { TextInput } from '@inkjs/ui';
 
-export const NameSelection = ({ onSubmit }: { onSubmit: (name: string) => void }) => {
+type NameSelectionProps = {
+  onSubmit: (name: string) => void;
+  onCancel: () => void;
+};
+
+export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
   const [name, setName] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [lastSubmittedValue, setLastSubmittedValue] = useState<string | null>(null);
 
-  const validateName = (input: string) => {
-    if (input.length < 2) {
-      return 'Too short';
+  const validateName = (input: string): string | null => {
+    const normalized = input
+      .trim()
+      .replace(/\s+/g, ' ');
+
+    if (!/^[a-zA-Z ]+$/.test(normalized)) {
+      return "This is a name, not a password.";
     }
 
-    if (!/^[a-zA-Z]+$/.test(input)) {
-      return 'Invalid characters';
+    if (normalized === '') {
+      return 'An empty name? Bold choice. Also… invalid.';
     }
 
-    if (input.length > 14) {
-      return 'Too long';
+    if (!/[a-zA-Z]{2}/.test(normalized)) {
+      return 'Those letters seem… socially distant.';
+    }
+
+    const lettersOnly = normalized.replace(/\s+/g, '');
+
+    if (lettersOnly.length > 14) {
+      return 'That name needs its own scroll.';
+    }
+
+    if (
+      normalized.toLowerCase() === 'narrator' ||
+      normalized.toLowerCase() === 'story teller'
+    ) {
+      return "Nice try. I’m already doing that job.";
     }
 
     return null;
   };
+  
+  useInput((_, key) => {
+    if (key.escape) {
+      onCancel?.();
+    }
+  });
+
 
   return (
     <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
@@ -31,9 +62,30 @@ export const NameSelection = ({ onSubmit }: { onSubmit: (name: string) => void }
 
       <TextInput
         placeholder="Type here"
-        onChange={setName}
-        onSubmit={() => onSubmit(name)}
+        onChange={(value) => {
+          setName(value);
+          if (errorMessage && value !== lastSubmittedValue) {
+            setErrorMessage(null);
+          }
+        }}
+        onSubmit={() => {
+          const error = validateName(name);
+
+          if (error) {
+            setLastSubmittedValue(name);
+            setErrorMessage(error);
+            return;
+          }
+
+          onSubmit(name.trim());
+        }}
       />
+      {errorMessage && (
+        <>
+          <Newline />
+          <Text color={'red'}>{errorMessage}</Text>
+        </>
+      )}
     </Box>
   );
 };

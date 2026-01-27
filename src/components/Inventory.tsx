@@ -3,7 +3,7 @@ import { Box, Text, Newline, useInput } from 'ink';
 import { Select } from '@inkjs/ui';
 import type { InventoryFilter, InventoryProps, FilterConfig, InventoryItem } from '../types/index.js';
 import { ItemType } from '../types/index.js';
-import { player } from "../launcher.js";
+import { player } from "./App.js";
 import { itemRegistry } from '../data/items.js';
 
 const FILTERS: Record<InventoryFilter, FilterConfig> = {

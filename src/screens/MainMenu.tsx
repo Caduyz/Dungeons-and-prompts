@@ -15,8 +15,8 @@ export function MainMenu({ goTo, exit }: MainMenuProps) {
       onSelect={(option) => {
         console.log('MainMenu:', option.id);
 
-        if (option.id === 'new') {
-          goTo('charCreation');
+        if (option.id === 'newGame') {
+          goTo('nameSelection');
         }
 
         if (option.id === 'inventory') {
