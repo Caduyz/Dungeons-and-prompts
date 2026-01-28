@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Box, Text, Newline, useInput } from 'ink';
 import { TextInput } from '@inkjs/ui';
+import { titleCase } from '../controllers/GameState.js';
 
 type NameSelectionProps = {
   onSubmit: (name: string) => void;
@@ -16,13 +17,17 @@ export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
     const normalized = input
       .trim()
       .replace(/\s+/g, ' ');
+    
+    if (normalized === '') {
+      return 'An empty name? Bold choice. Also… invalid.';
+    }
 
     if (!/^[a-zA-Z ]+$/.test(normalized)) {
       return "This is a name, not a password.";
     }
 
-    if (normalized === '') {
-      return 'An empty name? Bold choice. Also… invalid.';
+    if (normalized.length < 2) {
+      return 'Not even during the debugging did I see anyone so lazy.';
     }
 
     if (!/[a-zA-Z]{2}/.test(normalized)) {
@@ -31,7 +36,7 @@ export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
 
     const lettersOnly = normalized.replace(/\s+/g, '');
 
-    if (lettersOnly.length > 14) {
+    if (lettersOnly.length > 17) {
       return 'That name needs its own scroll.';
     }
 
@@ -46,7 +51,7 @@ export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
   };
   
   useInput((_, key) => {
-    if (key.escape) {
+    if (key.escape || key.backspace) {
       onCancel?.();
     }
   });
@@ -54,9 +59,7 @@ export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
 
   return (
     <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-      <Text bold color="magenta">
-        Name Selection
-      </Text>
+      <Text bold color="magenta">NAME SELECTION</Text>
 
       <Newline />
 
@@ -77,7 +80,7 @@ export const NameSelection = ({ onSubmit, onCancel }: NameSelectionProps) => {
             return;
           }
 
-          onSubmit(name.trim());
+          onSubmit(titleCase(name.trim()));
         }}
       />
       {errorMessage && (

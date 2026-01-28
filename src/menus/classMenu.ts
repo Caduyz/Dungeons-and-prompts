@@ -8,8 +8,7 @@ const classOptions = CLASSES.map((charClass) => ({
 }));
 
 export const classSelectionMenu: VerticalMenuProps = {
-  title: 'Class Selection',
+  title: 'CLASS SELECTION',
   titleColor: 'magenta',
-  options: classOptions,
-  loop: true,
+  menuOptions: classOptions,
 };

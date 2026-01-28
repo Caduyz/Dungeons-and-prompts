@@ -7,7 +7,8 @@ export type ScreenId =
   | 'dialog'
   | 'pause'
   | 'nameSelection'
-  | 'classSelection';
+  | 'classSelection'
+  | 'profile';
 
 // Inventory Only
 export type InventoryProps = {

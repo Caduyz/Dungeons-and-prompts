@@ -32,6 +32,7 @@ export interface Entity {
 export type Progression = {
   level: number;
   experience: number;
+  requiredExperience: number;
 }
 
 export type Class = {

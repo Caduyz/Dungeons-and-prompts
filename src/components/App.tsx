@@ -11,6 +11,7 @@ import { VerticalMenu } from './VerticalMenu.js';
 import { classSelectionMenu } from '../menus/classMenu.js'
 import { Character } from '../core/entities/Character.js';
 import { getClassById } from '../core/entities/classes.js';
+import { CharProfile } from '../screens/CharProfile.js';
 
 let playerName: string;
 
@@ -57,8 +58,14 @@ function App() {
                 onSelect={(option) => { 
                   console.log('Name:', playerName);     // For debugging
                   console.log('Class:', option.title);  // For debugging
-                  player = new Character(playerName, getClassById(option.title))
+                  player = new Character(playerName, getClassById(option.title));
+                  player.addItemToInventory('iron-chestplate')
+                  player.addItemToInventory('health-potion', 5)
+                  player.addItemToInventory('slime-ball', 5)
+                  player.addItemToInventory('iron-sword', 5)
+                  player.equipArmor('iron-chestplate')
                   goBack(2);
+                  goTo('profile');
                 }}
                 onCancel={() => goBack(1)}
               />
@@ -79,6 +86,12 @@ function App() {
                 }}
                 onClose={() => goBack(1)} 
                 />;
+
+    case 'profile':
+      return <CharProfile 
+              onSubmit={() => goBack(1)}
+              onCancel={() => goBack(1)}
+              />
 
     default:
       return null;
