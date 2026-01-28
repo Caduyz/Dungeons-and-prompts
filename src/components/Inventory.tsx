@@ -30,7 +30,7 @@ const rightMove: Record<InventoryFilter, InventoryFilter> = {
 
 export function Inventory(props: InventoryProps) {
   const {
-    title = 'Inventory',
+    title = 'INVENTORY',
     titleColor = 'yellow',
     items,
     onUseItem,
@@ -40,6 +40,7 @@ export function Inventory(props: InventoryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<InventoryFilter>('Consumables');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const filterConfig = FILTERS[selectedFilter];
   const filteredItems = items.filter(
@@ -48,8 +49,31 @@ export function Inventory(props: InventoryProps) {
 
   const selectedItem = filteredItems[selectedIndex];
 
+  const validateItemUse = (itemId: string | null): boolean => {
+    if (!itemId) return false;
+
+    const item = itemRegistry[itemId];
+
+    if (item?.type === ItemType.Armor) {
+      if (!item.availableClasses.includes(player.class.id)) {
+        setErrorMessage("Your class can't equip this armor!");
+        return false;
+      }
+      if (player.armory[item.equippableSlot] === item) {
+        setErrorMessage("This armor is already equipped!");
+        return false;
+      }
+    }
+
+    setErrorMessage(null);
+    return true;
+  };
+
   useInput((_, key) => {
     if (key.return && selectedItemId) {
+      if (!validateItemUse(selectedItemId)) {
+        return;
+      }
       onUseItem(selectedItemId);
     }
 
@@ -76,53 +100,61 @@ export function Inventory(props: InventoryProps) {
 
   useEffect(() => {
     const entry = filteredItems[selectedIndex];
-    setSelectedItemId(entry ? entry.item.id : null);
+    const id = entry ? entry.item.id : null;
+
+    setSelectedItemId(id);
+    validateItemUse(id);
   }, [selectedIndex, filteredItems]);
   
   return(
-    <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan">
-      <Text bold color={titleColor}>
-        {title} - {filterConfig.label} [{filterConfig.index} / 4]
-      </Text>
+    <Box flexDirection='row'>
+      <Box flexDirection="column" padding={2} borderStyle="round" borderColor="cyan" flexGrow={1}>
+        <Text bold color={titleColor}>
+          {title.toUpperCase()} - {filterConfig.label.toUpperCase()} [{filterConfig.index} / 4]
+        </Text>
 
-      <Newline />
-      <Text dimColor>← → to switch | ↑ ↓ to navigate | ESC to close | Enter to use</Text>
-      <Newline />
+        <Newline />
+        <Text dimColor>← → to switch | ↑ ↓ to navigate | ESC to close | Enter to use</Text>
+        <Newline />
 
+        {filteredItems.length === 0 ? (
+          <Text dimColor color="red">No items available.</Text>
+        ) : (
+          <Select 
+            options={filteredItems.map(item => ({
+              label: `${item.item.name} (x${item.quantity})`,
+              value: item.item.id
+          }))}
+          />
+        )}
+      </Box>
 
       {selectedItem && (
-        <>
-          <Text>Item Description</Text>
-          <Text dimColor>▶ {selectedItem.item.description}</Text>
+      <Box flexDirection='column' flexGrow={1} borderColor={'cyan'} borderStyle={'round'} padding={2}>
+        <Text bold>ITEM DESCRIPTION</Text>
+        <Text dimColor>{selectedItem?.item.description}</Text>
+        <Text dimColor>Amount: {selectedItem?.quantity}</Text>
+        {(selectedItem.item.type === ItemType.Consumable && selectedItem.item.effect === 'heal') && (
+          <Text dimColor color="blue">Heal: {selectedItem.item.value} {selectedItem.item.statAffected}</Text>
+        )}
 
-          {(selectedItem.item.type === ItemType.Consumable && selectedItem.item.effect === 'heal') && (
-            <Text dimColor color="blue">▶ Heal: {selectedItem.item.value} {selectedItem.item.statAffected}</Text>
-          )}
+        {selectedItem.item.type === ItemType.Armor && (
+          <Text dimColor color="blue">Defense: {selectedItem.item.defense}</Text>
+        )}
 
-          {selectedItem.item.type === ItemType.Armor && (
-            <Text dimColor color="blue">▶ Defense: {selectedItem.item.defense}</Text>
-          )}
-
-          {selectedItem.item.type === ItemType.Weapon && (
-            <Text dimColor color="red">▶ Damage: {selectedItem.item.damage}</Text>
-          )}
-
-          <Newline />
-        </>
+        {selectedItem.item.type === ItemType.Weapon && (
+          <Text dimColor color="red">Damage: {selectedItem.item.damage}</Text>
+        )}
+    
+        {errorMessage && (
+          <>
+            <Newline/>
+            <Text color={'red'}>{errorMessage}</Text>
+          </>
+        )}
+      </Box>
       )}
 
-
-      {filteredItems.length === 0 ? (
-        <Text color="red">No items available.</Text>
-      ) : (
-        <Select 
-          options={filteredItems.map(item => ({
-            label: `${item.item.name} (x${item.quantity})`,
-            value: item.item.id
-        }))}
-          onChange={setSelectedItemId}
-        />
-      )}
     </Box>
   ) 
 }

@@ -1,6 +1,7 @@
 import { type Attributes, type Entity, type Vitals, type Class, type Progression, ItemType, BodySlot, type Armory } from '../../types/index.js';
 import { itemRegistry } from '../../data/items.js';
 import { Classes } from './classes.js';
+import { EXP_MULTIPLIER } from '../../controllers/GameState.js';
 
 export class Character implements Entity {
   name: string;
@@ -24,7 +25,8 @@ export class Character implements Entity {
     this.class = characterClass;
     this.progression = {
       level: 1,
-      experience: 0
+      experience: 0,
+      requiredExperience: this.getRequiredExp(1)
     };
 
     this.attributes = {
@@ -42,6 +44,11 @@ export class Character implements Entity {
       currentHP: 50 + this.getVitalByAttribute(this.attributes.VIT),
       currentMP: 50 + this.getVitalByAttribute(this.attributes.WIS),
     };
+  }
+
+  getRequiredExp(level: number) { // Current level
+    const multiplier = 10 * EXP_MULTIPLIER;
+    return 50 + (level**2 * multiplier)
   }
 
   heal(amount: number): void {
@@ -120,6 +127,7 @@ export class Character implements Entity {
     }
     if (!(armor.availableClasses.includes(this.class.id)) && !(armor.availableClasses.includes(Classes.ALL))) {
       console.log("Your class can't equip this armor!")
+      return;
     }
     
     const slot = armor.equippableSlot;
@@ -131,7 +139,6 @@ export class Character implements Entity {
 
     else {
       this.armory[slot] = armor;
-      console.log(this.armory)
     }
   }
 
