@@ -21,6 +21,10 @@ export function VerticalMenu(props: VerticalMenuProps) {
     setSelectedOption(menuOptions[selectedIndex] ?? null);
   }, [selectedIndex, menuOptions]);
 
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [menuOptions]);
+
   useInput((_, key) => {
     if (key.escape || key.backspace) {
       onCancel?.();

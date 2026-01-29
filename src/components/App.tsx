@@ -11,7 +11,9 @@ import { VerticalMenu } from './VerticalMenu.js';
 import { classSelectionMenu } from '../menus/classMenu.js'
 import { Character } from '../core/entities/Character.js';
 import { getClassById } from '../core/entities/classes.js';
-import { CharProfile } from '../screens/CharProfile.js';
+import { CharProfile } from '../components/CharProfile.js';
+import { characterMenu } from '../menus/charMenu.js';
+import { AttributesMenu } from './SetAttributes.js';
 
 let playerName: string;
 
@@ -47,28 +49,21 @@ function App() {
       return <NameSelection 
         onSubmit={(name) => {
           playerName = name;
-          console.log(playerName);
           goTo('classSelection')
         }}
-        onCancel={() => goBack(1)}/>
+        onCancel={() => goBack(1)}
+        />;
 
     case 'classSelection':
         return <VerticalMenu
                 {...classSelectionMenu}
                 onSelect={(option) => { 
-                  console.log('Name:', playerName);     // For debugging
-                  console.log('Class:', option.title);  // For debugging
                   player = new Character(playerName, getClassById(option.title));
-                  player.addItemToInventory('iron-chestplate')
-                  player.addItemToInventory('health-potion', 5)
-                  player.addItemToInventory('slime-ball', 5)
-                  player.addItemToInventory('iron-sword', 5)
-                  player.equipArmor('iron-chestplate')
-                  goBack(2);
-                  goTo('profile');
+                  screenController.reset
+                  goTo('charMenu');
                 }}
                 onCancel={() => goBack(1)}
-              />
+                />;
 
     case 'inventory':
       return <Inventory
@@ -87,11 +82,40 @@ function App() {
                 onClose={() => goBack(1)} 
                 />;
 
-    case 'profile':
+    case 'charProfile':
       return <CharProfile 
               onSubmit={() => goBack(1)}
               onCancel={() => goBack(1)}
-              />
+              />;
+
+    case 'charMenu':
+      return <VerticalMenu
+                {...characterMenu}
+                onSelect={(option) => {
+                  if (option.id === 'charProfile') {
+                    goTo('charProfile');
+                  }
+                  if (option.id === 'inventory') {
+                    goTo('inventory');
+                  }
+                  if (option.id === 'setAttributes') {
+                    goTo('setAttributes');
+                  }
+                  if (option.id === 'return') {
+                    screenController.reset
+                    goTo('mainMenu');
+                  }
+                }}
+              />;
+
+    case 'setAttributes':
+      return <AttributesMenu
+              onSubmit={() => {console.log('success')}}
+              onCancel={() => {
+                goBack(1);
+              }}
+              attributes = {player.attributes}
+              />;
 
     default:
       return null;
