@@ -31,15 +31,18 @@ export function CharProfile({ onSubmit, onCancel }: CharProfileProps) {
 
         <Text bold color={'cyan'}>STATISTICS</Text>
         <Text bold>{player.name}</Text>
+        <Text bold color={'red'}>Health: [{player.vital.currentHP} / {player.vital.maxHP}]</Text>
+        <Text bold color={'blue'}>Mana: [{player.vital.currentMP} / {player.vital.maxMP}]</Text>
+        
         <Newline />
-        <Text>Class: {player.class.name}</Text>
-        <Text>Level: {player.progression.level} ({player.progression.experience}/{player.progression.requiredExperience})</Text>
-        <Text>Coins: {player.coins}</Text>
+        <Text color={'yellow'}>Class: {player.class.name}</Text>
+        <Text color={'yellow'}>Level: {player.progression.level} ({player.progression.experience}/{player.progression.requiredExperience})</Text>
+        <Text color={'yellow'}>Coins: {player.coins}</Text>
         <Newline />
-        <Text>Mobs Killed: Undone</Text>
-        <Text>Deaths: Undone</Text>
-        <Text>Total Exp Gained: Undone</Text>
-        <Text>Total Coins Gained: Undone</Text>
+        <Text color={'red'}>Mobs Killed: Undone</Text>
+        <Text color={'red'}>Deaths: Undone</Text>
+        <Text color={'red'}>Total Exp Gained: Undone</Text>
+        <Text color={'red'}>Total Coins Gained: Undone</Text>
 
 
       </Box>

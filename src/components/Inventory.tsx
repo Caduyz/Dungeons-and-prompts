@@ -95,7 +95,9 @@ export function Inventory(props: InventoryProps) {
       setSelectedFilter(rightMove[selectedFilter]);
     }
 
-    if (key.escape) onClose();
+    if (key.escape || key.backspace) {
+      onClose()
+    };
   });
 
   useEffect(() => {

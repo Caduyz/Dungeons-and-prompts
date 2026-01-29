@@ -30,12 +30,12 @@ export class Character implements Entity {
     };
 
     this.attributes = {
-      STR: 1 + characterClass.baseAttributes.STR,
-      DEX: 1 + characterClass.baseAttributes.DEX,
-      INT: 1 + characterClass.baseAttributes.INT,
-      VIT: 1 + characterClass.baseAttributes.VIT,
-      WIS: 1 + characterClass.baseAttributes.WIS,
-      DEF: 1 + characterClass.baseAttributes.DEF
+      STR: 10 + characterClass.baseAttributes.STR,
+      DEX: 10 + characterClass.baseAttributes.DEX,
+      INT: 10 + characterClass.baseAttributes.INT,
+      VIT: 10 + characterClass.baseAttributes.VIT,
+      WIS: 10 + characterClass.baseAttributes.WIS,
+      DEF: 10 + characterClass.baseAttributes.DEF
     };
 
     this.vital = {

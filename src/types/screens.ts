@@ -2,13 +2,15 @@ import type { InventoryItem } from "../types/index.js";
 
 export type ScreenId =
   | 'mainMenu'
+  | 'charMenu'
   | 'inventory'
   | 'battle'
   | 'dialog'
   | 'pause'
   | 'nameSelection'
   | 'classSelection'
-  | 'profile';
+  | 'charProfile'
+  | 'setAttributes';
 
 // Inventory Only
 export type InventoryProps = {

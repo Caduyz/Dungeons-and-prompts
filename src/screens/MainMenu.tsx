@@ -11,10 +11,7 @@ export function MainMenu({ goTo, exit }: MainMenuProps) {
   return (
     <VerticalMenu
       {...mainMenu}
-      loop
       onSelect={(option) => {
-        console.log('MainMenu:', option.id);
-
         if (option.id === 'newGame') {
           goTo('nameSelection');
         }

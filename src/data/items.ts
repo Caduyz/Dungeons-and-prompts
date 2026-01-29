@@ -16,5 +16,3 @@ for (const [id, item] of Object.entries(parsed)) {
 
   itemRegistry[id] = item;
 }
-
-console.log(itemRegistry);
