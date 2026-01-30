@@ -59,6 +59,14 @@ function App() {
                 {...classSelectionMenu}
                 onSelect={(option) => { 
                   player = new Character(playerName, getClassById(option.title));
+
+                  // Debugging
+                  const expAddDebugValuesProMax2011 = player.progression.addExp(50000, player.levelInfo.experience, player.levelInfo.level);
+                  player.levelInfo.experience = expAddDebugValuesProMax2011.newExp;
+                  player.levelInfo.level = expAddDebugValuesProMax2011.newLevel;
+                  player.levelInfo.requiredExperience = player.progression.getRequiredExp(player.levelInfo.level);
+                  player.statPoints = expAddDebugValuesProMax2011.statPoints;
+
                   screenController.reset
                   goTo('charMenu');
                 }}
@@ -110,11 +118,15 @@ function App() {
 
     case 'setAttributes':
       return <AttributesMenu
-              onSubmit={() => {console.log('success')}}
+              onSubmit={(newAttributes) => {
+                player.setAttributes(newAttributes);
+                goBack(1);
+              }}
               onCancel={() => {
                 goBack(1);
               }}
               attributes = {player.attributes}
+              statPoints={player.statPoints}
               />;
 
     default:

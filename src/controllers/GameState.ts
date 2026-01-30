@@ -1,5 +1,6 @@
 export const SCREEN_FPS = 30;
-export const EXP_MULTIPLIER = 1;
+export const EXP_NEEDED_MULTIPLIER = 1;
+export const EXP_GAIN_MULTIPLIER = 1;
 export let showAlert: boolean = false;
 
 export function changeAlertState(value: boolean) {
