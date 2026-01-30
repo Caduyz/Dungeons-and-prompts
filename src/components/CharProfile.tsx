@@ -9,6 +9,9 @@ type CharProfileProps = {
 const renderSlot = (item: { name: string; defense: number } | null) =>
   item ? `${item.name} [+${item.defense} DEF]` : 'None';
 
+const formatNumber = (value: number) =>
+  new Intl.NumberFormat('en-US').format(value);
+
 export function CharProfile({ onSubmit, onCancel }: CharProfileProps) {
   useInput((_, key) => {
     if (key.return) {
@@ -31,13 +34,13 @@ export function CharProfile({ onSubmit, onCancel }: CharProfileProps) {
 
         <Text bold color={'cyan'}>STATISTICS</Text>
         <Text bold>{player.name}</Text>
-        <Text bold color={'red'}>Health: [{player.vital.currentHP} / {player.vital.maxHP}]</Text>
-        <Text bold color={'blue'}>Mana: [{player.vital.currentMP} / {player.vital.maxMP}]</Text>
+        <Text bold color={'red'}>Health: [{formatNumber(player.vital.currentHP)} / {formatNumber(player.vital.maxHP)}]</Text>
+        <Text bold color={'blue'}>Mana: [{formatNumber(player.vital.currentMP)} / {formatNumber(player.vital.maxMP)}]</Text>
         
         <Newline />
         <Text color={'yellow'}>Class: {player.class.name}</Text>
-        <Text color={'yellow'}>Level: {player.progression.level} ({player.progression.experience}/{player.progression.requiredExperience})</Text>
-        <Text color={'yellow'}>Coins: {player.coins}</Text>
+        <Text color={'yellow'}>Level: {player.levelInfo.level} ({formatNumber(player.levelInfo.experience)} / {formatNumber(player.levelInfo.requiredExperience)})</Text>
+        <Text color={'yellow'}>Coins: {formatNumber(player.coins)}</Text>
         <Newline />
         <Text color={'red'}>Mobs Killed: Undone</Text>
         <Text color={'red'}>Deaths: Undone</Text>
@@ -60,7 +63,8 @@ export function CharProfile({ onSubmit, onCancel }: CharProfileProps) {
         <Text>DEX: {player.attributes.DEX}</Text>
         <Text>WIS: {player.attributes.WIS}</Text>
         <Text>VIT: {player.attributes.VIT}</Text>
-        <Text>DEF: {player.attributes.DEF}</Text>
+        <Newline />
+        <Text dimColor color={'yellow'}>Unused Points: {player.statPoints}</Text>
 
       </Box>
 

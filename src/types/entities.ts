@@ -8,7 +8,6 @@ export type Attributes = {
   INT: number;
   VIT: number;
   WIS: number;
-  DEF: number;
 }
 
 export type Vitals = {
@@ -29,7 +28,7 @@ export interface Entity {
 }
 
 // Character only
-export type Progression = {
+export type LevelInfo = {
   level: number;
   experience: number;
   requiredExperience: number;

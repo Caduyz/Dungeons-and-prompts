@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Box, Text, Newline, useInput } from 'ink';
 import type { Attributes } from '../types/index.js';
+import { player } from './App.js';
 
 type AttributesMenuProps = {
-  onSubmit: () => void,
+  onSubmit: (newAttributes: Attributes) => void,
   onCancel: () => void,
-  attributes: Attributes
+  attributes: Attributes,
+  statPoints: number
 }
 
-export function AttributesMenu({ onSubmit, onCancel, attributes }: AttributesMenuProps) {
+export function AttributesMenu({ onSubmit, onCancel, attributes, statPoints }: AttributesMenuProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [localAttributes, setLocalAttributes] = useState<Attributes>({ ...attributes });
+  const [remainingPoints, setRemainingPoints] = useState(statPoints);
 
   const entries = Object.entries(localAttributes) as [keyof Attributes, number][];
 
@@ -20,7 +23,8 @@ export function AttributesMenu({ onSubmit, onCancel, attributes }: AttributesMen
     }
 
     if (key.return) {
-      onSubmit();
+      onSubmit(localAttributes);
+      player.statPoints = remainingPoints;
     }
 
     if (key.upArrow) {
@@ -34,17 +38,20 @@ export function AttributesMenu({ onSubmit, onCancel, attributes }: AttributesMen
     if (key.rightArrow) {
       const entry = entries[selectedIndex];
       if (!entry) return;
+      if (remainingPoints <= 0) return;
 
       const [attr] = entry;
       setLocalAttributes(prev => ({
         ...prev,
         [attr]: prev[attr] + 1
       }));
+      setRemainingPoints(prev => prev - 1);
     }
 
     if (key.leftArrow) {
       const entry = entries[selectedIndex];
       if (!entry) return;
+      if (remainingPoints >= statPoints) return;
 
       const [attr] = entry;
 
@@ -56,6 +63,7 @@ export function AttributesMenu({ onSubmit, onCancel, attributes }: AttributesMen
           ...prev,
           [attr]: prev[attr] - 1
         }));
+        setRemainingPoints(prev => prev + 1);
       }
     }
   });
@@ -83,6 +91,9 @@ export function AttributesMenu({ onSubmit, onCancel, attributes }: AttributesMen
           </Text>
         );
       })}
+
+      <Newline />
+      <Text dimColor>Remaining Points: {remainingPoints}</Text>
     </Box>
   );
 }

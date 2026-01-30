@@ -1,11 +1,13 @@
-import { type Attributes, type Entity, type Vitals, type Class, type Progression, ItemType, BodySlot, type Armory } from '../../types/index.js';
+import { type Attributes, type Entity, type Vitals, type Class, type LevelInfo, ItemType, BodySlot, type Armory } from '../../types/index.js';
 import { itemRegistry } from '../../data/items.js';
 import { Classes } from './classes.js';
-import { EXP_MULTIPLIER } from '../../controllers/GameState.js';
+import { Progression } from '../systems/Progression.js';
 
 export class Character implements Entity {
   name: string;
+  levelInfo: LevelInfo;
   progression: Progression;
+  statPoints: number = 0;
   attributes: Attributes;
   vital: Vitals;
   class: Class;
@@ -23,32 +25,27 @@ export class Character implements Entity {
   constructor(name: string, characterClass: Class) {
     this.name = name;
     this.class = characterClass;
-    this.progression = {
+    this.progression = new Progression;
+    this.levelInfo = {
       level: 1,
       experience: 0,
-      requiredExperience: this.getRequiredExp(1)
+      requiredExperience: this.progression.getRequiredExp(1)
     };
 
     this.attributes = {
-      STR: 10 + characterClass.baseAttributes.STR,
-      DEX: 10 + characterClass.baseAttributes.DEX,
-      INT: 10 + characterClass.baseAttributes.INT,
-      VIT: 10 + characterClass.baseAttributes.VIT,
-      WIS: 10 + characterClass.baseAttributes.WIS,
-      DEF: 10 + characterClass.baseAttributes.DEF
+      STR: 1 + characterClass.baseAttributes.STR,
+      DEX: 1 + characterClass.baseAttributes.DEX,
+      INT: 1 + characterClass.baseAttributes.INT,
+      VIT: 1 + characterClass.baseAttributes.VIT,
+      WIS: 1 + characterClass.baseAttributes.WIS,
     };
 
     this.vital = {
       maxHP: 50 + this.getVitalByAttribute(this.attributes.VIT),
-      maxMP: 50 + this.getVitalByAttribute(this.attributes.WIS),
       currentHP: 50 + this.getVitalByAttribute(this.attributes.VIT),
+      maxMP: 50 + this.getVitalByAttribute(this.attributes.WIS),
       currentMP: 50 + this.getVitalByAttribute(this.attributes.WIS),
     };
-  }
-
-  getRequiredExp(level: number) { // Current level
-    const multiplier = 10 * EXP_MULTIPLIER;
-    return 50 + (level**2 * multiplier)
   }
 
   heal(amount: number): void {
@@ -147,5 +144,15 @@ export class Character implements Entity {
       throw new Error("Item not found.") 
     }
     return itemRegistry[itemId];
+  }
+
+  setAttributes(newAttributes: Attributes) {
+    this.vital.currentHP += (newAttributes.VIT - this.attributes.VIT) * 5;
+    this.vital.maxHP += (newAttributes.VIT - this.attributes.VIT) * 5;
+
+    this.vital.currentMP += (newAttributes.WIS - this.attributes.WIS) * 5;
+    this.vital.maxMP += (newAttributes.WIS - this.attributes.WIS) * 5;
+
+    this.attributes = newAttributes;
   }
 }
