@@ -1,4 +1,4 @@
-import type { ScreenId } from '../types/index.js';
+import type { ScreenId } from "../ui/types.js";
 
 export class ScreenController {
   private stack: ScreenId[] = ['mainMenu'];

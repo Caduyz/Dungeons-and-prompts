@@ -4,8 +4,7 @@
   "description": "> Dungeons & Prompts é um RPG de texto baseado em turnos que roda diretamente no terminal utilizando de Raw Mode e Readline para captação de entradas e navegação entre menus.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "game": "tsx src/launcher.ts"
+    "game": "tsx src/main.ts"
   },
   "keywords": [],
   "author": "",
